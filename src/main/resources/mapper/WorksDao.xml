@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.learn.dao.WorksDao">
+
+    <resultMap type="com.learn.entity.Works" id="WorksMap">
+        <result property="id" column="id" jdbcType="INTEGER"/>
+        <result property="uid" column="uid" jdbcType="INTEGER"/>
+        <result property="writetime" column="writeTime" jdbcType="TIMESTAMP"/>
+        <result property="collection" column="collection" jdbcType="INTEGER"/>
+        <result property="howlike" column="howlike" jdbcType="INTEGER"/>
+        <result property="type" column="type" jdbcType="VARCHAR"/>
+        <result property="content" column="content" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="queryById" resultMap="WorksMap">
+        select id,
+               uid,
+               writeTime,
+               collection,
+               howlike,
+               type,
+               content
+        from works
+        where id = #{id}
+    </select>
+
+    <!--查询所有或者个人的数据-->
+    <select id="queryAll" resultType="com.learn.entity.request.BrowseWorks">
+        select
+        works.id, uid, writeTime, collection, howlike, type, content,username, avatarurl,userstatus
+        from works,user where works.uid=user.id
+        <where>
+            <if test="uid != 0 ">
+                and uid = #{uid}
+            </if>
+        </where>
+        order by writeTime desc
+    </select>
+
+    <!--统计总行数-->
+    <select id="count" resultType="java.lang.Long">
+        select count(1)
+        from works
+        <where>
+            <if test="id != null">
+                and id = #{id}
+            </if>
+            <if test="uid != null">
+                and uid = #{uid}
+            </if>
+            <if test="writetime != null">
+                and writeTime = #{writetime}
+            </if>
+            <if test="collection != null">
+                and collection = #{collection}
+            </if>
+            <if test="howlike != null">
+                and howlike = #{howlike}
+            </if>
+            <if test="type != null and type != ''">
+                and type = #{type}
+            </if>
+            <if test="content != null and content != ''">
+                and content = #{content}
+            </if>
+        </where>
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="id" useGeneratedKeys="true">
+        insert into works(uid, writeTime, collection, howlike, type, content)
+        values (#{uid}, #{writetime}, #{collection}, #{howlike}, #{type}, #{content})
+    </insert>
+
+    <insert id="insertBatch" keyProperty="id" useGeneratedKeys="true">
+        insert into works(uid, writeTime, collection, howlike, type, content)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            (#{entity.uid}, #{entity.writetime}, #{entity.collection}, #{entity.howlike}, #{entity.type},
+            #{entity.content})
+        </foreach>
+    </insert>
+
+    <insert id="insertOrUpdateBatch" keyProperty="id" useGeneratedKeys="true">
+        insert into works(uid, writeTime, collection, howlike, type, content)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            (#{entity.uid}, #{entity.writetime}, #{entity.collection}, #{entity.howlike}, #{entity.type},
+            #{entity.content})
+        </foreach>
+        on duplicate key update
+        uid = values(uid),
+        writeTime = values(writeTime),
+        collection = values(collection),
+        howlike = values(howlike),
+        type = values(type),
+        content = values(content)
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update works
+        <set>
+            <if test="uid != null">
+                uid = #{uid},
+            </if>
+            <if test="writetime != null">
+                writeTime = #{writetime},
+            </if>
+            <if test="collection != null">
+                collection = #{collection},
+            </if>
+            <if test="howlike != null">
+                howlike = #{howlike},
+            </if>
+            <if test="type != null and type != ''">
+                type = #{type},
+            </if>
+            <if test="content != null and content != ''">
+                content = #{content},
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteById">
+        delete
+        from works
+        where id = #{id}
+    </delete>
+
+</mapper>
+

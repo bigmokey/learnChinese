@@ -1,0 +1,24 @@
+server:
+  port: 8081
+  servlet:
+    context-path: /
+spring:
+#  mvc:
+#    view:
+#      prefix: /
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource #指定连接池类型
+    driver-class-name: com.mysql.cj.jdbc.Driver #指定驱动
+    url: jdbc:mysql://localhost:3306/learnchinese?characterEncoding=UTF-8&serverTimezone=GMT%2B8 #指定 url
+    username: root #指定用户名
+    password: 784928376a #指定密码
+mybatis:
+  mapper-locations: classpath:mapper/*.xml #指定mapper配置文件位置
+  type-aliases-package: com.learn.entity #指定起别名所在包
+logging:
+  level:
+    root: info #指定根日志级别(一般不推荐修改根日志,输出信息太多,推荐使用子日志)
+    com.learn.dao: debug #指定某个包中日志
+  file:
+    name: logback_learn.log #指定日志名称
+    path: ./ #指定日志文件目录

@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.learn.dao.PoetryDao">
+
+    <resultMap type="com.learn.entity.Poetry" id="PoetryMap">
+        <result property="poetryId" column="poetry_id" jdbcType="INTEGER"/>
+        <result property="poetryTitle" column="poetry_title" jdbcType="VARCHAR"/>
+        <result property="poetryResource" column="poetry_resource" jdbcType="VARCHAR"/>
+        <result property="poetryImg" column="poetry_img" jdbcType="VARCHAR"/>
+        <result property="poetryIntroduce" column="poetry_introduce" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="queryById" resultMap="PoetryMap">
+        select poetry_id,
+               poetry_title,
+               poetry_resource,
+               poetry_img,
+               poetry_introduce
+        from poetry
+        where poetry_id = #{poetryId}
+    </select>
+
+    <!--查询指定行数据-->
+    <select id="dividePage" resultMap="PoetryMap">
+        select
+        poetry_id, poetry_title, poetry_resource, poetry_img, poetry_introduce
+        from poetry
+
+    </select>
+
+    <!--统计总行数-->
+    <select id="count" resultType="java.lang.Long">
+        select count(1)
+        from poetry
+        <where>
+            <if test="poetryId != null">
+                and poetry_id = #{poetryId}
+            </if>
+            <if test="poetryTitle != null and poetryTitle != ''">
+                and poetry_title = #{poetryTitle}
+            </if>
+            <if test="poetryResource != null and poetryResource != ''">
+                and poetry_resource = #{poetryResource}
+            </if>
+            <if test="poetryImg != null and poetryImg != ''">
+                and poetry_img = #{poetryImg}
+            </if>
+            <if test="poetryIntroduce != null and poetryIntroduce != ''">
+                and poetry_introduce = #{poetryIntroduce}
+            </if>
+        </where>
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="poetryId" useGeneratedKeys="true">
+        insert into poetry(poetry_title, poetry_resource, poetry_img, poetry_introduce)
+        values (#{poetryTitle}, #{poetryResource}, #{poetryImg}, #{poetryIntroduce})
+    </insert>
+
+    <insert id="insertBatch" keyProperty="poetryId" useGeneratedKeys="true">
+        insert into poetry(poetry_title, poetry_resource, poetry_img, poetry_introduce)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            (#{entity.poetryTitle}, #{entity.poetryResource}, #{entity.poetryImg}, #{entity.poetryIntroduce})
+        </foreach>
+    </insert>
+
+    <insert id="insertOrUpdateBatch" keyProperty="poetryId" useGeneratedKeys="true">
+        insert into poetry(poetry_title, poetry_resource, poetry_img, poetry_introduce)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            (#{entity.poetryTitle}, #{entity.poetryResource}, #{entity.poetryImg}, #{entity.poetryIntroduce})
+        </foreach>
+        on duplicate key update
+        poetry_title = values(poetry_title),
+        poetry_resource = values(poetry_resource),
+        poetry_img = values(poetry_img),
+        poetry_introduce = values(poetry_introduce)
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update poetry
+        <set>
+            <if test="poetryTitle != null and poetryTitle != ''">
+                poetry_title = #{poetryTitle},
+            </if>
+            <if test="poetryResource != null and poetryResource != ''">
+                poetry_resource = #{poetryResource},
+            </if>
+            <if test="poetryImg != null and poetryImg != ''">
+                poetry_img = #{poetryImg},
+            </if>
+            <if test="poetryIntroduce != null and poetryIntroduce != ''">
+                poetry_introduce = #{poetryIntroduce},
+            </if>
+        </set>
+        where poetry_id = #{poetryId}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteById">
+        delete
+        from poetry
+        where poetry_id = #{poetryId}
+    </delete>
+
+</mapper>
+

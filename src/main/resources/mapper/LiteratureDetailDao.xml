@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.learn.dao.LiteratureDetailDao">
+
+    <resultMap type="com.learn.entity.LiteratureDetail" id="LiteratureDetailMap">
+        <result property="literatureDetailId" column="literature_detail_id" jdbcType="INTEGER"/>
+        <result property="literatureDetailTitle" column="literature_detail_title" jdbcType="VARCHAR"/>
+        <result property="literatureId" column="literature_id" jdbcType="INTEGER"/>
+        <result property="literatureResource" column="literature_resource" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="queryById" resultMap="LiteratureDetailMap">
+        select literature_detail_id,
+               literature_detail_title,
+               literature_id,
+               literature_resource
+        from literature_detail
+        where literature_detail_id = #{literatureDetailId}
+    </select>
+
+    <!--查询指定行数据-->
+    <select id="dividePage" resultMap="LiteratureDetailMap">
+        select
+        literature_detail_id, literature_detail_title, literature_id, literature_resource
+        from literature_detail
+        <where>
+            <if test="literature_id!=null and literature_id!=''">
+                and literature_id = #{literature_id}
+            </if>
+            <if test="literature_id==null or literature_id==''">
+                and literature_id in(
+                select literature_id from literature
+                WHERE literature_classify_id = #{literatureClassifyId})
+            </if>
+        </where>
+    </select>
+
+    <!--统计总行数-->
+    <select id="count" resultType="java.lang.Long">
+        select count(1)
+        from literature_detail
+        <where>
+            <if test="literatureDetailId != null">
+                and literature_detail_id = #{literatureDetailId}
+            </if>
+            <if test="literatureDetailTitle != null and literatureDetailTitle != ''">
+                and literature_detail_title = #{literatureDetailTitle}
+            </if>
+            <if test="literatureId != null">
+                and literature_id = #{literatureId}
+            </if>
+            <if test="literatureResource != null and literatureResource != ''">
+                and literature_resource = #{literatureResource}
+            </if>
+        </where>
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="literatureDetailId" useGeneratedKeys="true">
+        insert into literature_detail(literature_detail_title, literature_id, literature_resource)
+        values (#{literatureDetailTitle}, #{literatureId}, #{literatureResource})
+    </insert>
+
+    <insert id="insertBatch" keyProperty="literatureDetailId" useGeneratedKeys="true">
+        insert into literature_detail(literature_detail_title, literature_id, literature_resource)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            (#{entity.literatureDetailTitle}, #{entity.literatureId}, #{entity.literatureResource})
+        </foreach>
+    </insert>
+
+    <insert id="insertOrUpdateBatch" keyProperty="literatureDetailId" useGeneratedKeys="true">
+        insert into literature_detail(literature_detail_title, literature_id, literature_resource)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            (#{entity.literatureDetailTitle}, #{entity.literatureId}, #{entity.literatureResource})
+        </foreach>
+        on duplicate key update
+        literature_detail_title = values(literature_detail_title),
+        literature_id = values(literature_id),
+        literature_resource = values(literature_resource)
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update literature_detail
+        <set>
+            <if test="literatureDetailTitle != null and literatureDetailTitle != ''">
+                literature_detail_title = #{literatureDetailTitle},
+            </if>
+            <if test="literatureId != null">
+                literature_id = #{literatureId},
+            </if>
+            <if test="literatureResource != null and literatureResource != ''">
+                literature_resource = #{literatureResource},
+            </if>
+        </set>
+        where literature_detail_id = #{literatureDetailId}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteById">
+        delete
+        from literature_detail
+        where literature_detail_id = #{literatureDetailId}
+    </delete>
+
+</mapper>
+

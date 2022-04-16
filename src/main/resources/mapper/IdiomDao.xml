@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.learn.dao.IdiomDao">
+
+    <resultMap type="com.learn.entity.Idiom" id="IdiomMap">
+        <result property="idiomId" column="idiom_id" jdbcType="INTEGER"/>
+        <result property="idiomTitle" column="idiom_title" jdbcType="VARCHAR"/>
+        <result property="idiomResource" column="idiom_resource" jdbcType="VARCHAR"/>
+        <result property="idiomImg" column="idiom_img" jdbcType="VARCHAR"/>
+        <result property="idiomIntroduce" column="idiom_introduce" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="queryById" resultMap="IdiomMap">
+        select idiom_id,
+               idiom_title,
+               idiom_resource,
+               idiom_img,
+               idiom_introduce
+        from idiom
+        where idiom_id = #{idiomId}
+    </select>
+
+    <!--查询指定行数据-->
+    <select id="dividePage" resultMap="IdiomMap">
+        select
+        idiom_id, idiom_title, idiom_resource, idiom_img, idiom_introduce
+        from idiom
+
+    </select>
+
+    <!--统计总行数-->
+    <select id="count" resultType="java.lang.Long">
+        select count(1)
+        from idiom
+        <where>
+            <if test="idiomId != null">
+                and idiom_id = #{idiomId}
+            </if>
+            <if test="idiomTitle != null and idiomTitle != ''">
+                and idiom_title = #{idiomTitle}
+            </if>
+            <if test="idiomResource != null and idiomResource != ''">
+                and idiom_resource = #{idiomResource}
+            </if>
+            <if test="idiomImg != null and idiomImg != ''">
+                and idiom_img = #{idiomImg}
+            </if>
+            <if test="idiomIntroduce != null and idiomIntroduce != ''">
+                and idiom_introduce = #{idiomIntroduce}
+            </if>
+        </where>
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="idiomId" useGeneratedKeys="true">
+        insert into idiom(idiom_title, idiom_resource, idiom_img, idiom_introduce)
+        values (#{idiomTitle}, #{idiomResource}, #{idiomImg}, #{idiomIntroduce})
+    </insert>
+
+    <insert id="insertBatch" keyProperty="idiomId" useGeneratedKeys="true">
+        insert into idiom(idiom_title, idiom_resource, idiom_img, idiom_introduce)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            (#{entity.idiomTitle}, #{entity.idiomResource}, #{entity.idiomImg}, #{entity.idiomIntroduce})
+        </foreach>
+    </insert>
+
+    <insert id="insertOrUpdateBatch" keyProperty="idiomId" useGeneratedKeys="true">
+        insert into idiom(idiom_title, idiom_resource, idiom_img, idiom_introduce)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            (#{entity.idiomTitle}, #{entity.idiomResource}, #{entity.idiomImg}, #{entity.idiomIntroduce})
+        </foreach>
+        on duplicate key update
+        idiom_title = values(idiom_title),
+        idiom_resource = values(idiom_resource),
+        idiom_img = values(idiom_img),
+        idiom_introduce = values(idiom_introduce)
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update idiom
+        <set>
+            <if test="idiomTitle != null and idiomTitle != ''">
+                idiom_title = #{idiomTitle},
+            </if>
+            <if test="idiomResource != null and idiomResource != ''">
+                idiom_resource = #{idiomResource},
+            </if>
+            <if test="idiomImg != null and idiomImg != ''">
+                idiom_img = #{idiomImg},
+            </if>
+            <if test="idiomIntroduce != null and idiomIntroduce != ''">
+                idiom_introduce = #{idiomIntroduce},
+            </if>
+        </set>
+        where idiom_id = #{idiomId}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteById">
+        delete
+        from idiom
+        where idiom_id = #{idiomId}
+    </delete>
+
+</mapper>
+
